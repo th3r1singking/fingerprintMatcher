@@ -1,4 +1,4 @@
-package com.fingerprint.matcher.project;
+package com.fingerprint.matcher.project.util;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -6,12 +6,12 @@ import java.nio.file.Paths;
 import com.machinezoo.sourceafis.FingerprintMatcher;
 import com.machinezoo.sourceafis.FingerprintTemplate;
 
-public class TemplateClass {
+public class SourceAFISAlgo {
 
-	public static void main(String[] args) throws Exception {
+	public static boolean match(String toMatch, String matchAgainst, double threshold) throws Exception {
 		
-		byte[] probeImage = Files.readAllBytes(Paths.get("E:\\Downloads\\New folder\\socofing\\Real\\1__M_Left_index_finger.bmp"));
-		byte[] candidateImage = Files.readAllBytes(Paths.get("E:\\Downloads\\New folder\\socofing\\Real\\1__M_Left_little_finger.bmp"));
+		byte[] probeImage = Files.readAllBytes(Paths.get(toMatch));
+		byte[] candidateImage = Files.readAllBytes(Paths.get(matchAgainst));
 
 		FingerprintTemplate probe = new FingerprintTemplate().dpi(500).create(probeImage);
 
@@ -19,10 +19,8 @@ public class TemplateClass {
 		
 		double score = new FingerprintMatcher().index(probe).match(candidate);
 		
-		double threshold = 40;
-		
 		boolean matches = score >= threshold;
 		
-		System.out.println(matches);
+		return matches;
 	}
 }
