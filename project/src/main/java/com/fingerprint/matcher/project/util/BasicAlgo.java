@@ -3,48 +3,64 @@ package com.fingerprint.matcher.project.util;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.PixelGrabber;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
-class BasicAlgo {
-	public void matchFingerprint(int threshold) {
+public class BasicAlgo {
+	public static boolean matchFingerprint(File probe, File candidate, int threshold) {
+		
+		boolean response = false;
+		
 		try {
 
-			String file1 = "sq.png";
-			String file2 = "sq.png";
-
-			Image pic1 = Toolkit.getDefaultToolkit().getImage(file1);
-			Image pic2 = Toolkit.getDefaultToolkit().getImage(file2);
-
+			Image probeImage = Toolkit.getDefaultToolkit().getImage(probe.getAbsolutePath());
+			Image candidateImage = Toolkit.getDefaultToolkit().getImage(candidate.getAbsolutePath());
+			
 			try {
-
-				PixelGrabber grab11 = new PixelGrabber(pic1, 0, 0, -1, -1, false);
-				PixelGrabber grab21 = new PixelGrabber(pic2, 0, 0, -1, -1, false);
-
-				int array1[] = null;
-
-				if (grab11.grabPixels()) {
-					int width = grab11.getWidth();
-					int height = grab11.getHeight();
-					array1 = new int[width * height];
-					array1 = (int[]) grab11.getPixels();
+				
+				PixelGrabber probeGrab = new PixelGrabber(probeImage, 0, 0, -1, -1, false);
+				PixelGrabber candidateGrab = new PixelGrabber(candidateImage, 0, 0, -1, -1, false);
+				
+				int[] probeArray = null;
+				
+				if (probeGrab.grabPixels()) {
+					int width = probeGrab.getWidth();
+					int height = probeGrab.getHeight();
+					probeArray = new int[width * height];
+					probeArray = (int[]) probeGrab.getPixels();
 				}
-
-				int[] array2 = null;
-
-				if (grab21.grabPixels()) {
-					int width = grab21.getWidth();
-					int height = grab21.getHeight();
-					array2 = new int[width * height];
-					array2 = (int[]) grab21.getPixels();
+				
+				int[] candidateArray = null;
+				
+				if (candidateGrab.grabPixels()) {
+					int width = candidateGrab.getWidth();
+					int height = candidateGrab.getHeight();
+					candidateArray = new int[width * height];
+					candidateArray = (int[]) candidateGrab.getPixels();
 				}
-
-				System.out.println("Pixels equal: " + java.util.Arrays.equals(array1, array2));
-
-			} catch (InterruptedException e1) {
+				
+				Set<Integer> probeSet = new HashSet<Integer>();
+				for (int n : probeArray) {
+					probeSet.add(n);
+				}
+				Set<Integer> candidateSet = new HashSet<Integer>();
+				for (int n : candidateArray) {
+					candidateSet.add(n);
+				}
+				candidateSet.removeAll(probeSet);
+				if(threshold <= probeSet.size() - candidateSet.size() * 100) {
+					response = true;
+				}
+				
+			} catch (final Exception e1) {
 				e1.printStackTrace();
 			}
 
-		} catch (Throwable t) {
-			System.out.println("Fail - " + t.getMessage());
+		} catch (final Exception e2) {
+			System.out.println("Error - " + e2.getMessage());
 		}
+		
+		return response;
 	}
 }

@@ -13,13 +13,14 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.fingerprint.matcher.project.FingerPrintMatcher;
+
 public class ExcelFunctions {
 
-	public static final String FILE_NAME = "E:\\Downloads\\Fingerprints\\data_set.xlsx";
 	static int rowNum = 0;
     static int colNum = 0;
 
-	public static void createExcel(String sheetName) {
+	public static void createExcel(String sheetName, String fileName) {
 		
 		XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(sheetName);
@@ -33,7 +34,7 @@ public class ExcelFunctions {
         }
 
 		try {
-			FileOutputStream outputStream = new FileOutputStream(FILE_NAME);
+			FileOutputStream outputStream = new FileOutputStream(FingerPrintMatcher.DIRECTORY + fileName);
 			workbook.write(outputStream);
 			workbook.close();
 		} catch (FileNotFoundException e) {
@@ -43,14 +44,14 @@ public class ExcelFunctions {
 		}
 	}
 	
-	public static void writeToExcel(String[] data) {
+	public static void writeToExcel(String[] data, String fileName) {
 		
 		FileInputStream excelFile;
 		Workbook workbook = null; 
 		Sheet sheet = null;
 
 		try {
-			excelFile = new FileInputStream(new File(FILE_NAME));
+			excelFile = new FileInputStream(new File(FingerPrintMatcher.DIRECTORY + fileName));
 			workbook = new XSSFWorkbook(excelFile);
 			sheet = workbook.getSheetAt(0);
 		} catch (final Exception e) {
@@ -65,7 +66,7 @@ public class ExcelFunctions {
         }
 
 		try {
-			FileOutputStream outputStream = new FileOutputStream(FILE_NAME);
+			FileOutputStream outputStream = new FileOutputStream(FingerPrintMatcher.DIRECTORY + fileName);
 			workbook.write(outputStream);
 			workbook.close();
 		} catch (FileNotFoundException e) {
