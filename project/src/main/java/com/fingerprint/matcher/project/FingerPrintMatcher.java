@@ -38,13 +38,13 @@ public class FingerPrintMatcher {
     		
     		if(serializeChoice.equalsIgnoreCase("Y")) {
     			System.out.println("Serializing...");
-    			SourceAFISAlgo.serializePrints(DIRECTORY);
+//    			SourceAFISAlgo.serializePrints(DIRECTORY);
     			
     			System.out.println("Matching Prints...");
-    			matchSourceAFIS();
+//    			matchSourceAFIS();
     		} else if (serializeChoice.equalsIgnoreCase("N")) {
     			System.out.println("Matching Prints...");
-    			matchSourceAFIS();    			
+//    			matchSourceAFIS();    			
     		} else {
     			System.out.println("Please remove all images that are not files and try again.");
     		}
@@ -85,7 +85,7 @@ public class FingerPrintMatcher {
 							stopWatch.start();
 							boolean match = BasicAlgo.matchFingerprint(probe, candidate, threshold);
 							results[1] = match == true ? "1" : "0";
-							results[2] = probe.getAbsolutePath().equals(candidate.getAbsolutePath()) ? "0" : "1";
+							results[2] = probe.getName().equals(candidate.getName()) ? "0" : "1";
 							stopWatch.split();
 							results[3] = stopWatch.toSplitString();
 							results[4] = "0";

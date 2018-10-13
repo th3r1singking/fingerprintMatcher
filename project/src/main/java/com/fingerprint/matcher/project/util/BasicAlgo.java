@@ -4,8 +4,6 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.PixelGrabber;
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 public class BasicAlgo {
 	public static boolean matchFingerprint(File probe, File candidate, int threshold) {
@@ -40,16 +38,14 @@ public class BasicAlgo {
 					candidateArray = (int[]) candidateGrab.getPixels();
 				}
 				
-				Set<Integer> probeSet = new HashSet<Integer>();
-				for (int n : probeArray) {
-					probeSet.add(n);
+				int diff = 0;
+				for(int i = 0; i < probeArray.length; i++) {
+					if(probeArray[i] != candidateArray[i]) {
+						diff++;
+					}
 				}
-				Set<Integer> candidateSet = new HashSet<Integer>();
-				for (int n : candidateArray) {
-					candidateSet.add(n);
-				}
-				candidateSet.removeAll(probeSet);
-				if(threshold <= probeSet.size() - candidateSet.size() * 100) {
+				
+				if(threshold <= (probeArray.length - diff)/probeArray.length * 100) {
 					response = true;
 				}
 				
