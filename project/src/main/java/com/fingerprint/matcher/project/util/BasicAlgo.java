@@ -40,8 +40,12 @@ public class BasicAlgo {
 				
 				int diff = 0;
 				for(int i = 0; i < probeArray.length; i++) {
-					if(probeArray[i] != candidateArray[i]) {
-						diff++;
+					if(probeArray != null && candidateArray != null) {
+						if(probeArray.length == candidateArray.length){
+							if(probeArray[i] != candidateArray[i]) {
+								diff++;
+							}
+						}
 					}
 				}
 				

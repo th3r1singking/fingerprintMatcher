@@ -15,9 +15,7 @@ public class SourceAFISAlgo {
 		
 		double score = new FingerprintMatcher().index(probe).match(candidate);
 		
-		boolean matches = score >= threshold;
-		
-		return matches;
+		return score >= threshold;
 	}
 	
 	public static void serializePrints(String path) throws Exception{
@@ -47,7 +45,7 @@ public class SourceAFISAlgo {
 				}
 			}
 		} catch (final Exception e) {
-			System.out.println("No files detected. Goodbye :P");
+			System.out.println("File error. Make sure only picture (PNG, JPG) files are in fingerprint directory.");
 		} finally {
 			writer.close();
 		}

@@ -28,7 +28,9 @@ public class FingerPrintMatcher {
     	
     	System.out.println("Please enter path of finderprints :");
     	DIRECTORY = scanner.nextLine().replace("\\", "\\\\");
-    	
+    	if(!DIRECTORY.endsWith("\\")) {
+    		DIRECTORY += "\\";
+    	}
     	System.out.println("Are there only fingerprint images in the file path described (Y/N) :");
     	String only = scanner.nextLine();
     	
@@ -38,13 +40,13 @@ public class FingerPrintMatcher {
     		
     		if(serializeChoice.equalsIgnoreCase("Y")) {
     			System.out.println("Serializing...");
-//    			SourceAFISAlgo.serializePrints(DIRECTORY);
+    			SourceAFISAlgo.serializePrints(DIRECTORY);
     			
     			System.out.println("Matching Prints...");
-//    			matchSourceAFIS();
+    			matchSourceAFIS();
     		} else if (serializeChoice.equalsIgnoreCase("N")) {
     			System.out.println("Matching Prints...");
-//    			matchSourceAFIS();    			
+    			matchSourceAFIS();    			
     		} else {
     			System.out.println("Please remove all images that are not files and try again.");
     		}
@@ -66,7 +68,10 @@ public class FingerPrintMatcher {
     	File[] printStore = folder.listFiles();
     	File[] printsToMatch = folder.listFiles();
 
-    	int[] thresholds = {100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50};
+    	List<String[]> data = new ArrayList<String[]>();
+
+    	int[] thresholds = {100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45};
+
 
 		for(int num : thresholds) {
     		
@@ -74,33 +79,47 @@ public class FingerPrintMatcher {
     		ExcelFunctions.createExcel("Basic_Threshold_" + num, "Basic_Threshold_" + num + ".xlsx");
     		
 			for (File probe : printStore) {
-				if(!probe.isDirectory() && !probe.getAbsolutePath().endsWith(".xlsx")) {
+				if(!probe.isDirectory() && !probe.getAbsolutePath().endsWith(".xlsx") && !probe.getAbsolutePath().endsWith(".txt")) {
 					for (File candidate : printsToMatch) {
-						if(!candidate.isDirectory() && !candidate.getAbsolutePath().endsWith(".xlsx")) {
+						if(!candidate.isDirectory() && !candidate.getAbsolutePath().endsWith(".xlsx") && !probe.getAbsolutePath().endsWith(".txt")) {
 							int threshold = num;
 							
-							String[] results = new String[6];
+							String[] results = new String[7];
 							results[0] = String.valueOf(threshold);
 							
 							stopWatch.start();
 							boolean match = BasicAlgo.matchFingerprint(probe, candidate, threshold);
 							results[1] = match == true ? "1" : "0";
-							results[2] = probe.getName().equals(candidate.getName()) ? "0" : "1";
+							if(results[1] == "1" && probe.getName().equalsIgnoreCase(candidate.getName())) {
+								results[2] = "1";
+							} else if(results[1] == "1" && !probe.getName().equalsIgnoreCase(candidate.getName())) {
+								results[2] = "1";
+							} else {
+								results[2] = "0";
+							}
+							if(results[1] == "0" && probe.getName().equalsIgnoreCase(candidate.getName())) {
+								results[3] = "1";
+							} else {
+								results[3] = "0";
+							}
 							stopWatch.split();
-							results[3] = stopWatch.toSplitString();
-							results[4] = "0";
+							results[4] = stopWatch.toSplitString();
 							results[5] = "0";
+							results[6] = "0";
 							stopWatch.stop();
 							stopWatch.reset();
 							
-							ExcelFunctions.writeToExcel(results, "Basic_Threshold_" + num + ".xlsx");
+							data.add(results);
+
 						}
 					}
 				}
 			}
+			ExcelFunctions.writeToExcel(data, "Basic_Threshold_" + num + ".xlsx");
+			data.clear();
 		}
-    	
-    	System.out.println("Done!");
+		
+    	System.out.println("Done with Basic!");
     }
     
     public static void matchSourceAFIS() throws Exception {
@@ -122,18 +141,21 @@ public class FingerPrintMatcher {
 		}
     	List<String> printsToMatch = printStore;
 
-    	int[] thresholds = {100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50};
+    	List<String[]> data = new ArrayList<String[]>();
     	
+    	int[] thresholds = {100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45};
+    	
+
     	for(int num : thresholds) {
     		
     		System.out.println("Running for threshold : " + num);
-    		ExcelFunctions.createExcel("AFIS_Threshold_" + num, "AFIS_Threshold_" + num + ".xlsx");
-    		
+    		ExcelFunctions.createExcel("AFIS_" + num, "AFIS_" + num + ".xlsx");
+
 			for (String probe : printStore) {
 				for (String candidate : printsToMatch) {
 					int threshold = num;
 					
-					String[] results = new String[6];
+					String[] results = new String[7];
 					results[0] = String.valueOf(threshold);
 					
 					stopWatch.start();
@@ -142,19 +164,32 @@ public class FingerPrintMatcher {
 							new FingerprintTemplate().deserialize(candidate),
 							threshold);
 					results[1] = match == true ? "1" : "0";
-					results[2] = probe.equals(candidate) ? "0" : "1";
+					if(results[1] == "1" && probe.equalsIgnoreCase(candidate)) {
+						results[2] = "0";
+					} else if(results[1] == "1" && !probe.equalsIgnoreCase(candidate)) {
+						results[2] = "1";
+					} else {
+						results[2] = "";
+					}
+					if(results[1] == "0" && probe.equalsIgnoreCase(candidate)) {
+						results[3] = "1";
+					} else {
+						results[3] = "0";
+					}
 					stopWatch.split();
-					results[3] = stopWatch.toSplitString();
-					results[4] = "0";
+					results[4] = stopWatch.toSplitString();
 					results[5] = "0";
+					results[6] = "0";
 					stopWatch.stop();
 					stopWatch.reset();
 					
-					ExcelFunctions.writeToExcel(results, "AFIS_Threshold_" + num + ".xlsx");
+					data.add(results);
 				}
 			}
+			ExcelFunctions.writeToExcel(data, "AFIS_" + num + ".xlsx");
+			data.clear();
 		}
     	
-    	System.out.println("Done!");
+    	System.out.println("Done with AFIS!");
     }
 }
